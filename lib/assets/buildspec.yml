@@ -1,0 +1,22 @@
+version: "0.2"
+
+env:
+  shell: bash
+
+phases:
+  build:
+    commands:
+      - cd demo-app
+      - export TRUNK_BUILD_RELEASE=true
+      - trunk build
+      - cd dist
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: 'demo-app/dist'
+
+cache:
+  paths:
+    - $HOME/.cargo/registry/**/*
+    
