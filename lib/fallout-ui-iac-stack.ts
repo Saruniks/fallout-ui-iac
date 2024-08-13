@@ -27,14 +27,14 @@ export class FalloutUiIacStack extends cdk.Stack {
       buildSpec: codebuild.BuildSpec.fromAsset(path.join(__dirname, 'assets/buildspec.yml')),
     });
 
-    const pipeline = new codepipeline.Pipeline(this, 'FalloutUiIacStackFrontendPipeline')
+    const pipeline = new codepipeline.Pipeline(this, 'FalloutUiPipeline')
 
     const sourceOutput = new codepipeline.Artifact()
 
     pipeline.addStage({
       stageName: 'Source',
       actions: [new actions.GitHubSourceAction({
-        actionName: 'Source-Action',
+        actionName: 'GitHubSource',
         output: sourceOutput,
         owner: sourceOwner,
         repo,
@@ -50,15 +50,15 @@ export class FalloutUiIacStack extends cdk.Stack {
       ]
     })
 
-    const cloudFrontSpa = new CloudFrontSpa(this, 'FalloutUiIacCloudFrontStack', {
-      tag: 'FalloutUiIac'
+    const cloudFrontSpa = new CloudFrontSpa(this, 'FalloutUiCloudFrontStack', {
+      tag: 'FalloutUi'
     });
 
     pipeline.addStage({
-      stageName: 'DeployFalloutUi',
+      stageName: 'Deploy',
       actions: [
         new actions.S3DeployAction({
-          actionName: 'S3_Deploy_Frontend_Artifacts',
+          actionName: 'DeployArtifactsToS3',
           bucket: cloudFrontSpa.bucket,
           input: rustSpaBuild.buildOutput,
           extract: true,
